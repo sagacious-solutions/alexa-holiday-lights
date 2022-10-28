@@ -1,0 +1,2 @@
+python-dotenv==0.21.0
+flask-ask-sdk==1.0.0
