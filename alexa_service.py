@@ -67,8 +67,18 @@ def launch_request_handler(handler_input):
 def set_rainbow_chase_handler(handler_input):
     """Handler for setRainbowChaseIntent Intent."""
     # type: (HandlerInput) -> Response
-    speech_text = "Settings lights to Rainbow Chase"
+    speech_text = "Setting lights to Rainbow Chase"
     light_loop.set_looping_pattern(xmasTree.rainbowCycle)
+    return handler_input.response_builder.speak(speech_text).set_should_end_session(
+        True).response
+
+
+@sb.request_handler(can_handle_func=is_intent_name("slowRainbowTheaterChaseIntent"))
+def slow_rainbow_chase_handler(handler_input):
+    """Handler for setRainbowChaseIntent Intent."""
+    # type: (HandlerInput) -> Response
+    speech_text = "Setting lights to slow Rainbow Theater Chase"
+    light_loop.set_looping_pattern(xmasTree.theaterChaseRainbow, {"wait_ms": 100})
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -78,7 +88,27 @@ def turn_off_lights_intent(handler_input):
     """Handler to turn off the lights."""
     # type: (HandlerInput) -> Response
     speech_text = "Turning off the lights."
-    light_loop.set_static_lights(xmasTree.setSolid, {LedColor.black})
+    light_loop.set_static_lights(xmasTree.setSolid, {"color": LedColor.black})
+    return handler_input.response_builder.speak(speech_text).set_should_end_session(
+        True).response
+
+
+@sb.request_handler(can_handle_func=is_intent_name("solidRandomIntent"))
+def random_solid_intent(handler_input):
+    """Handler to turn the string random colors."""
+    # type: (HandlerInput) -> Response
+    speech_text = "Setting to random solid colors."
+    light_loop.set_static_lights(xmasTree.random_colors)
+    return handler_input.response_builder.speak(speech_text).set_should_end_session(
+        True).response
+
+
+@sb.request_handler(can_handle_func=is_intent_name("slowRandomTransitionIntent"))
+def random_transition_slow(handler_input):
+    """Handler to turn the string random colors."""
+    # type: (HandlerInput) -> Response
+    speech_text = "Starting random color mood."
+    light_loop.set_static_lights(xmasTree.loop_random_color_transition)
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -158,7 +188,6 @@ def test_turn_yellow():
     light_loop.process = Process(target=xmasTree.setSolid, args=[LedColor.yellow])
     light_loop.process.start()
     return FlaskResponse("Test Received!!", status=202)
-
 
 
 if __name__ == "__main__":
