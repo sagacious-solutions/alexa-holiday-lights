@@ -73,7 +73,7 @@ def slow_rainbow_chase_handler(handler_input):
     """Handler for setRainbowChaseIntent Intent."""
     # type: (HandlerInput) -> Response
     speech_text = "Setting lights to slow Rainbow Theater Chase"
-    light_loop.set_looping_pattern(xmasTree.theaterChaseRainbow, {"wait_ms": 100})
+    light_loop.set_looping_pattern(xmasTree.theater_chase_rainbow, {"wait_ms": 100})
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -103,8 +103,8 @@ def random_transition_slow(handler_input):
     """Handler to turn the string random colors."""
     # type: (HandlerInput) -> Response
     speech_text = "Starting random color mood."
-    light_loop.set_static_lights(
-        xmasTree.loop_random_color_transition, {"interval_sec": 2}
+    light_loop.set_looping_pattern(
+        xmasTree.transition_to_random_color, {"wait_after_transition_ms": 1}
     )
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response

@@ -23,6 +23,8 @@ class XmasString:
         #  level shift)
         LED_CHANNEL = 0
 
+        self.ONE_SECOND_IN_MILLISECONDS = 1000
+        self.MAX_COLOR_VALUE = 256
         self.LEFT_SIDE_PIXELS = [i for i in range(32)]
         self.TOP_PIXELS = [i for i in range(33, 66)]
         self.RIGHT_SIDE_PIXELS = [i for i in range(67, 100)]
@@ -66,7 +68,7 @@ class XmasString:
             self.strip.setPixelColor(0 + i, color)
             self.strip.setPixelColor(self.strip.numPixels() - i, color)
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+            time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
 
     def random_colors(self, time_ms: Optional[int] = 50, *args, **kwargs):
         """Move from outside in one pixel at a time changing to random colors
@@ -82,7 +84,7 @@ class XmasString:
                 self.strip.numPixels() - i, LedColor.get_random()
             )
             self.strip.show()
-            time.sleep(time_ms / 1000.0)
+            time.sleep(time_ms / self.ONE_SECOND_IN_MILLISECONDS)
 
     def color_wipe_inside_out(
         self, color: Color, wait_ms: Optional[int] = 50, *args, **kwargs
@@ -100,7 +102,7 @@ class XmasString:
             self.strip.setPixelColor(half - i, color)
             self.strip.setPixelColor(half + i, color)
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+            time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
 
     # Define functions which animate LEDs in various ways.
     def color_wipe(
@@ -125,7 +127,7 @@ class XmasString:
         for i in range(*wipe_direction):
             self.strip.setPixelColor(i, color)
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+            time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
 
     def set_solid(self, color: Color):
         """Sets the whole light string to the new color all at once.
@@ -161,13 +163,21 @@ class XmasString:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, color)
                 self.strip.show()
-                time.sleep(wait_ms / 1000.0)
+                time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
 
     @staticmethod
-    def wheel(pos):
-        """Generate rainbow colors across 0-255 positions."""
+    def wheel(pos: int):
+        """Generate rainbow colors across 0-255 positions. This is a helper
+            for the rainbow functions
+
+        Args:
+            pos (int): See value to choose color
+
+        Returns:
+            Color: The new color
+        """
         if pos < 85:
             return Color(pos * 3, 255 - pos * 3, 0)
         elif pos < 170:
@@ -177,43 +187,81 @@ class XmasString:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
 
-    def rainbow(self, wait_ms=20, iterations=1, **kwargs):
-        """Draw rainbow that fades across all pixels at once."""
-        print("rainbow")
-        print(wait_ms)
-        for j in range(256 * iterations):
-            for i in range(self.strip.numPixels()):
-                self.strip.setPixelColor(i, self.wheel((i + j) & 255))
-            self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+    def rainbow(
+        self,
+        wait_ms: Optional[int] = 20,
+        iterations: Optional[int] = 1,
+        **kwargs,
+    ):
+        """Draw rainbow that fades across all pixels at once.
 
-    def rainbowCycle(self, wait_ms=20, iterations=5):
-        """Draw rainbow that uniformly distributes itself across all pixels."""
-        print("Rainbow Cycle")
-        for j in range(256 * iterations):
+        Args:
+            wait_ms (Optional[int]): Wait between color loops. Defaults to 20.
+            iterations (Optional[int]): How many times to run through a color
+                loop. Defaults to 1.
+        """
+        logger.info(f"Rainbow\nwait_ms: {wait_ms}\niterations: {iterations}")
+        for j in range(self.MAX_COLOR_VALUE * iterations):
+            for i in range(self.strip.numPixels()):
+                self.strip.setPixelColor(
+                    i, self.wheel((i + j) & self.MAX_COLOR_VALUE - 1)
+                )
+            self.strip.show()
+            time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
+
+    def rainbowCycle(
+        self, wait_ms: Optional[int] = 20, iterations: Optional[int] = 5
+    ):
+        """Draw rainbow that uniformly distributes itself across all pixels.
+
+        Args:
+            wait_ms (Optional[int]): Time between refreshing the string. Defaults to 20.
+            iterations (Optional[int]): Amount of times to run the loop. Defaults to 5.
+        """
+        logger.info(
+            f"Rainbow Cycle\nwait_ms: {wait_ms}\niterations: {iterations}"
+        )
+        for j in range(self.MAX_COLOR_VALUE * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(
                     i,
                     self.wheel(
-                        (int(i * 256 / self.strip.numPixels()) + j) & 255
+                        (
+                            int(
+                                i
+                                * self.MAX_COLOR_VALUE
+                                / self.strip.numPixels()
+                            )
+                            + j
+                        )
+                        & self.MAX_COLOR_VALUE - 1
                     ),
                 )
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+            time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
 
-    def theaterChaseRainbow(self, wait_ms=50):
-        """Rainbow movie theater light style chaser animation."""
-        for j in range(256):
+    def theater_chase_rainbow(self, wait_ms: Optional[int] = 50):
+        """Creates a rainbow theater chase pattern
+
+        Args:
+            wait_ms (Optional[int]): Time between refreshes. Defaults to 50.
+        """
+        for j in range(self.MAX_COLOR_VALUE):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i + q, self.wheel((i + j) % 255))
+                    self.strip.setPixelColor(
+                        i + q, self.wheel((i + j) % self.MAX_COLOR_VALUE - 1)
+                    )
                 self.strip.show()
-                time.sleep(wait_ms / 1000.0)
+                time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
 
     def transition_colors(
-        self, c1: Color, c2: Color, time_ms: int = 1000
+        self,
+        c1: Color,
+        c2: Color,
+        time_ms: int = 1000,
     ) -> None:
         """Transition the whole light string from one color to another in a slow fade
 
@@ -239,26 +287,62 @@ class XmasString:
 
             time.sleep(0.001)
 
-    def transition_to_color(self, new_color, time_ms=1000):
+    def transition_to_color(
+        self, new_color: Color, time_ms: Optional[int] = 1000
+    ):
+        """Transition the whole light string from current color to another in
+            a slow fade. This acts on whatever the current color of pixel 0 is
+            rather than fading each color to the new color. So if its currently
+            multiple colors, it will turn every pixel to the first color before starting
+            the transition.
+
+        Args:
+            new_color (Color): Time to transition to new color.
+            time_ms (Optional[int], optional): _description_. Defaults to 1000.
+        """
         current_color = self.strip.getPixelColor(0)
         self.transition_colors(current_color, new_color, time_ms)
 
+    def transition_to_random_color(
+        self,
+        transition_time_ms: Optional[int] = 1000,
+        wait_after_transition_sec: Optional[int] = 0,
+        **kwargs,
+    ):
+        """Transition the whole light string from current color to another in
+            a slow fade. This acts on whatever the current color of pixel 0 is
+            rather than fading each color to the new color. So if its currently
+            multiple colors, it will turn every pixel to the first color before starting
+            the transition.
+
+        Args:
+            transition_time_ms (Optional[int]): Time to fade to the new color in
+                milliseconds. Defaults to 1000.
+            wait_after_transition_sec (Optional[int]): Time to wait after changing to
+                the new color. Defaults to 0.
+        """
+        current_color = self.strip.getPixelColor(0)
+        self.transition_colors(
+            current_color, LedColor.get_random(), transition_time_ms
+        )
+        time.sleep(wait_after_transition_sec)
+
     @staticmethod
-    def get_rgb_value(color_int):
+    def get_rgb_value(color_int: Color) -> List[int]:
+        """The colors are held as integer values. This gets takes a Color and converts
+            it into a list of 3 integers representing RGB in the range 0-255
+
+        Args:
+            color_int (Color): Color to get the integer list for.
+
+        Returns:
+            List[int]: 3 Integer values in a list from 0-255 for RGB
+        """
         r = color_int >> 16 & 0xFF
         g = color_int >> 8 & 0xFF
         b = color_int & 0xFF
 
         return [r, g, b]
-
-    def loop_random_color_transition(
-        self, interval_sec: float = 0, transition_time: int = 1000
-    ):
-        while True:
-            self.transition_to_color(
-                LedColor.get_random(), time_ms=transition_time
-            )
-            time.sleep(interval_sec)
 
 
 xmasTree = XmasString()
