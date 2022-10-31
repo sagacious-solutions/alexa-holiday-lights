@@ -9,7 +9,7 @@ from simple_logging import get_basic_logger
 logger = get_basic_logger()
 
 
-class XmasString:
+class LightString:
     def __init__(self) -> None:
         # LED strip configuration:
         LED_COUNT = 100  # Number of LED pixels.
@@ -209,7 +209,7 @@ class XmasString:
             self.strip.show()
             time.sleep(wait_ms / self.ONE_SECOND_IN_MILLISECONDS)
 
-    def rainbowCycle(
+    def rainbow_cycle(
         self, wait_ms: Optional[int] = 20, iterations: Optional[int] = 5
     ):
         """Draw rainbow that uniformly distributes itself across all pixels.
@@ -345,4 +345,4 @@ class XmasString:
         return [r, g, b]
 
 
-xmasTree = XmasString()
+light_string = LightString()
