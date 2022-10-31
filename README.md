@@ -6,7 +6,7 @@
         <th>Invocation Phrases</th>
         <th>Intent in Alexa Dash</th>
         <th>Loop Function</th>
-        <th>Function Called</th>
+        <th>Function Called / kwargs</th>
     </tr>
     <tr>
         <td>turn off lights</td>
@@ -37,6 +37,12 @@
 </table>
 
 ## Hardware
+<p>Current hardware is a Raspberry Pi 4 running off an NVMe SSD on USB3.0 for rapid prototyping. However once development is complete it will likely be moved to Raspberry Pi Zero W or other inexpensive SBC.</p>
+<img src="./docs/pi4_hardware.jpg" width="50%" />
+
+### RGB Lights
+<img src="./docs/one_light.jpg" width="50%" />
+
 ### Pinout
 <img src="./docs/pi_pinout.png" width="50%" />
 <p>Image source <a href="https://pinout.xyz/">https://pinout.xyz/</a></p>
