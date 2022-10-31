@@ -39,3 +39,4 @@
 ## Hardware
 ### Pinout
 <img src="./docs/pi_pinout.png" width="50%" />
+<p>Image source <a href="https://pinout.xyz/">https://pinout.xyz/</a></p>
