@@ -31,48 +31,6 @@ class XmasString:
         )
         self.strip.begin()
 
-    def rain_drop(
-        self,
-        pixel_n: int,
-        rain_direction: int = 1,
-        length=5,
-        color: Color = LedColor.blue,
-    ):
-        tail_direction = rain_direction * -1
-        end_point = pixel_n + (length * tail_direction)
-        color = self.get_rgb_value(color)
-
-        # set first pixel of rain drop
-        start_color = self.get_rgb_value(self.strip.getPixelColor(pixel_n))
-        self.strip.setPixelColor(pixel_n, Color(*color))
-        color_diff = []
-        for i in range(3):
-            color_diff.append((start_color[i] - color[i]) / length)
-        # xmasTree.setSolid(color=LedColor.black)
-
-        count = 0
-        for i in range(end_point, pixel_n, tail_direction * -1):
-            count += tail_direction
-            new_color = []
-            for j in range(3):
-                new_color.append(
-                    round(start_color[j] + (color_diff[j] * count))
-                )
-            print(f"count : {count} new_color : {new_color}")
-            self.strip.setPixelColor(i, Color(*new_color))
-        self.strip.show()
-
-    def door_frame_rain(
-        self,
-        color: Color = LedColor.blue,
-    ):
-        for i in range(self.RIGHT_SIDE_PIXELS[0], self.RIGHT_SIDE_PIXELS[-1]):
-            self.rain_drop(i, color=color)
-            time.sleep(0.05)
-        for i in range(self.LEFT_SIDE_PIXELS[-1], self.LEFT_SIDE_PIXELS[0], -1):
-            self.rain_drop(i, color=color)
-            time.sleep(0.05)
-
     def set_color_for_pixels(self, pixel_list: List[int], color: Color):
         for pixel_n in pixel_list:
             self.strip.setPixelColor(pixel_n, color)
