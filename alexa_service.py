@@ -21,18 +21,13 @@ import config
 
 sb = SkillBuilder()
 
-
-def set_leds_violet():
-    xmasTree.setSolid(LedColor.brightViolet)
-
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
 class LightLoop:
     def __init__(self):
-        self.process = Process(target=set_leds_violet)
+        self.process = Process(target=xmasTree.set_solid, args=[LedColor.brightViolet])
         self.process.start()
 
     def set_looping_pattern(self, callback: Callable, kwargs={}):
@@ -88,7 +83,7 @@ def turn_off_lights_intent(handler_input):
     """Handler to turn off the lights."""
     # type: (HandlerInput) -> Response
     speech_text = "Turning off the lights."
-    light_loop.set_static_lights(xmasTree.setSolid, {"color": LedColor.black})
+    light_loop.set_static_lights(xmasTree.set_solid, {"color": LedColor.black})
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -108,7 +103,9 @@ def random_transition_slow(handler_input):
     """Handler to turn the string random colors."""
     # type: (HandlerInput) -> Response
     speech_text = "Starting random color mood."
-    light_loop.set_static_lights(xmasTree.loop_random_color_transition, {"interval_sec":2})
+    light_loop.set_static_lights(
+        xmasTree.loop_random_color_transition, {"interval_sec": 2}
+    )
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -185,10 +182,16 @@ def invoke_skill():
 @app.route("/test/", methods=['GET', 'POST'])
 def test_turn_yellow():
     light_loop.process.terminate()
-    light_loop.process = Process(target=xmasTree.setSolid, args=[LedColor.yellow])
+    light_loop.process = Process(target=xmasTree.set_solid, args=[LedColor.yellow])
     light_loop.process.start()
     return FlaskResponse("Test Received!!", status=202)
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0", ssl_context=(config.https_cert, config.https_key))
+    app.run(
+        # Port in use by tunnel
+        port=5000,
+        # Run on all IPs
+        host="0.0.0.0",
+        ssl_context=(config.https_cert, config.https_key)
+    )

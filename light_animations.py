@@ -1,7 +1,12 @@
+from typing import List, Optional
 import time
+
 from rpi_ws281x import Color, PixelStrip
 from colors import LedColor
-from typing import List
+
+from simple_logging import get_basic_logger
+
+logger = get_basic_logger()
 
 
 class XmasString:
@@ -12,7 +17,10 @@ class XmasString:
         LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
         LED_DMA = 10  # DMA channel to use for generating signal (try 10)
         LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
-        LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
+        LED_INVERT = (
+            False  # True to invert the signal (when using NPN transistor
+        )
+        #  level shift)
         LED_CHANNEL = 0
 
         self.LEFT_SIDE_PIXELS = [i for i in range(32)]
@@ -32,14 +40,26 @@ class XmasString:
         self.strip.begin()
 
     def set_color_for_pixels(self, pixel_list: List[int], color: Color):
+        """Sets every pixel in the provided list to the given color
+
+        Args:
+            pixel_list (List[int]): A list of pixels (lights) to change
+            color (Color): The color to change to
+        """
         for pixel_n in pixel_list:
             self.strip.setPixelColor(pixel_n, color)
         self.strip.show()
 
     def color_wipe_inside_out_reversed(
-        self, color, wait_ms=50, *args, **kwargs
+        self, color: Color, wait_ms: Optional[int] = 50, *args, **kwargs
     ):
-        """Wipe color across display a pixel at a time."""
+        """Does rolling color change from the outside of the string to the center
+
+        Args:
+            color (Color): The color to change to
+            wait_ms (int, optional): how many milliseconds between changing each pixel.
+                Defaults to 50.
+        """
         print("color_wipe_inside_out_reversed")
         half = int(self.strip.numPixels() / 2)
         for i in range(half):
@@ -48,9 +68,13 @@ class XmasString:
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
-    def random_colors(self, *args, **kwargs):
-        """Wipe color across display a pixel at a time."""
-        print("color_wipe_inside_out_reversed")
+    def random_colors(self, time_ms: Optional[int] = 50, *args, **kwargs):
+        """Move from outside in one pixel at a time changing to random colors
+
+        Args:
+            time_ms (Optional[int]): Time in ms between pixel changes. Defaults to 50.
+        """
+        logger.info("Setting string to random colors.")
         half = int(self.strip.numPixels() / 2)
         for i in range(half):
             self.strip.setPixelColor(0 + i, LedColor.get_random())
@@ -58,11 +82,19 @@ class XmasString:
                 self.strip.numPixels() - i, LedColor.get_random()
             )
             self.strip.show()
-            time.sleep(40 / 1000.0)
+            time.sleep(time_ms / 1000.0)
 
-    def color_wipe_inside_out(self, color, wait_ms=50, *args, **kwargs):
-        """Wipe color across display a pixel at a time."""
-        print(f"color_wipe_inside_out")
+    def color_wipe_inside_out(
+        self, color: Color, wait_ms: Optional[int] = 50, *args, **kwargs
+    ):
+        """Changes from current color to the new color from center of the string to the
+            outside of the string
+
+        Args:
+            color (Color): _description_
+            wait_ms (int, optional): _description_. Defaults to 50.
+        """
+        print("color_wipe_inside_out")
         half = int(self.strip.numPixels() / 2)
         for i in range(half):
             self.strip.setPixelColor(half - i, color)
@@ -71,9 +103,20 @@ class XmasString:
             time.sleep(wait_ms / 1000.0)
 
     # Define functions which animate LEDs in various ways.
-    def color_wipe(self, color, wait_ms=50, reverse=False, **kwargs):
-        """Wipe color across display a pixel at a time."""
-        print(f"Colorwipe - Reversed:{reverse}")
+    def color_wipe(
+        self, color: Color, wait_ms: Optional[int] = 50, reverse=False, **kwargs
+    ):
+        """Change the color from the current color to the provided one, one pixel at a
+        time from one side of the string to the other
+
+        Args:
+            color (Color): _description_
+            wait_ms (int, optional): How long in milliseconds between pixel changes.
+                Defaults to 50.
+            reverse (bool, optional): When True, goes from the right side to the left
+                instead of vice versa. Defaults to False.
+        """
+        logger.info(f"Colorwipe - Reversed:{reverse}")
         wipe_direction = (
             (self.strip.numPixels(), 0, -1)
             if reverse
@@ -84,66 +127,36 @@ class XmasString:
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
-    def setSolid(self, color: Color):
-        """Set to a solid color"""
-        print("Setting to solid color")
+    def set_solid(self, color: Color):
+        """Sets the whole light string to the new color all at once.
+
+        Args:
+            color (Color): New color to change too
+        """
+        logger.info("Setting to solid color")
 
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
 
         self.strip.show()
 
-    def nightRider(self, wait_ms=50, iterations=20, *args):
-        print("nightRider")
+    def theater_chase(
+        self,
+        color: Color,
+        wait_ms: Optional[int] = 50,
+        iterations: Optional[int] = 10,
+        **kwargs,
+    ):
+        """Movie theater light style chaser animation.
 
-        cl_ray = [0, 255, 0]
-
-        for i in range(iterations):
-            if i == 0:
-                self.color_wipe(
-                    color=Color(
-                        cl_ray[(0 + i) % 3],
-                        cl_ray[(1 + i) % 3],
-                        cl_ray[(2 + i) % 3],
-                    ),
-                    wait_ms=1,
-                )
-            for j in range(self.strip.numPixels()):
-                if j > 0:
-                    self.strip.setPixelColor(j - 1, Color(0, 0, 0))
-
-                self.strip.setPixelColor(
-                    j,
-                    Color(
-                        cl_ray[(1 + i) % 3],
-                        cl_ray[(2 + i) % 3],
-                        cl_ray[(0 + i) % 3],
-                    ),
-                )
-                self.strip.show()
-                time.sleep(wait_ms / 1000)
-
-            for j in range(self.strip.numPixels()):
-                if j > 0:
-                    self.strip.setPixelColor(
-                        self.strip.numPixels() - j + 1,
-                        Color(
-                            cl_ray[(2 + i) % 3],
-                            cl_ray[(0 + i) % 3],
-                            cl_ray[(1 + i) % 3],
-                        ),
-                    )
-
-                self.strip.setPixelColor(
-                    self.strip.numPixels() - j, Color(255, 0, 0)
-                )
-                self.strip.show()
-                time.sleep(wait_ms / 1000)
-
-    def theater_chase(self, color, wait_ms=50, iterations=10, **kwargs):
-        """Movie theater light style chaser animation."""
-        print("theaterChase()")
-        for j in range(iterations):
+        Args:
+            color (Color): Color to do the animation in
+            wait_ms (Optional[int]): Time between pixel changes. Defaults to 50.
+            iterations (Optional[int]): How many time to run the animation.
+                Defaults to 10.
+        """
+        logger.info("Running theater chase")
+        for _ in range(iterations):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, color)
