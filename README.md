@@ -1,7 +1,5 @@
 # Alexa Holiday Lights
 
-Tired of your boring old run of the mill holiday lights? This voice enabled light string will bring a whole new level to your decoration game. It Features simple and calm animations and colors for relaxing moods all the way up to spinning rainbow animations ready for the dance floor. You'll be sure you can set your room for any mood without leaving the couch.
-
 This is a repository for my holiday light string. Utilizing a Raspberry Pi and a ws281x RGB Light string, we are able to create a voice controlled set of lights.
 
 ### To Get Running
