@@ -108,7 +108,7 @@ def random_transition_slow(handler_input):
     """Handler to turn the string random colors."""
     # type: (HandlerInput) -> Response
     speech_text = "Starting random color mood."
-    light_loop.set_static_lights(xmasTree.loop_random_color_transition)
+    light_loop.set_static_lights(xmasTree.loop_random_color_transition, {"interval_sec":2})
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 

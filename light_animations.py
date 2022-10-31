@@ -1,5 +1,5 @@
 import time
-from rpi_ws281x import Color, PixelStrip, ws
+from rpi_ws281x import Color, PixelStrip
 from colors import LedColor
 from typing import List
 
@@ -241,7 +241,17 @@ class XmasString:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
 
-    def transition_colors(self, c1, c2, time_ms=1000):
+    def transition_colors(
+        self, c1: Color, c2: Color, time_ms: int = 1000
+    ) -> None:
+        """Transition the whole light string from one color to another in a slow fade
+
+        Args:
+            c1 (Color): Color to transition from
+            c2 (Color): Color to transition to
+            time_ms (int, optional): AMount of time for the fade to take.
+                Defaults to 1000.
+        """
         c1 = self.get_rgb_value(c1)
         c2 = self.get_rgb_value(c2)
         # difference between colors
@@ -258,26 +268,9 @@ class XmasString:
 
             time.sleep(0.001)
 
-    def transition_to_color(self, color, time_ms=1000):
-        current_color = self.get_rgb_value(self.strip.getPixelColor(0))
-        color = self.get_rgb_value(color)
-        # difference between colors
-        dif = [
-            color[0] - current_color[0],
-            color[1] - current_color[1],
-            color[2] - current_color[2],
-        ]
-        for j in range(time_ms):
-            new_color = [
-                round(current_color[0] + dif[0] * (j / time_ms)),
-                round(current_color[1] + dif[1] * (j / time_ms)),
-                round(current_color[2] + dif[2] * (j / time_ms)),
-            ]
-            for i in range(self.strip.numPixels()):
-                self.strip.setPixelColor(i, Color(*new_color))
-            self.strip.show()
-
-            time.sleep(0.001)
+    def transition_to_color(self, new_color, time_ms=1000):
+        current_color = self.strip.getPixelColor(0)
+        self.transition_colors(current_color, new_color, time_ms)
 
     @staticmethod
     def get_rgb_value(color_int):
