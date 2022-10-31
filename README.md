@@ -18,7 +18,7 @@ This is a repository for my holiday light string. Utilizing a Raspberry Pi and a
     - Make sure the service runs as sudo, otherwise it will error out as it won't have hardware level access
 
 ### A note about security
-    If doing this you should understand your network security. I recommend putting the hardware in a VLAN thats firewalled off from the rest of your network or isolating the hardware in your routers DMZ.
+<pre>If doing this you should understand your network security. I recommend putting the hardware in a VLAN thats firewalled off from the rest of your network or isolating the hardware in your routers DMZ.</pre>
 
 ### Current Skills
 
