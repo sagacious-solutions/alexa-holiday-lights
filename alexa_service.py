@@ -21,18 +21,13 @@ import config
 
 sb = SkillBuilder()
 
-
-def set_leds_violet():
-    xmasTree.setSolid(LedColor.brightViolet)
-
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
 class LightLoop:
     def __init__(self):
-        self.process = Process(target=set_leds_violet)
+        self.process = Process(target=xmasTree.set_solid, args=[LedColor.brightViolet])
         self.process.start()
 
     def set_looping_pattern(self, callback: Callable, kwargs={}):
@@ -67,8 +62,18 @@ def launch_request_handler(handler_input):
 def set_rainbow_chase_handler(handler_input):
     """Handler for setRainbowChaseIntent Intent."""
     # type: (HandlerInput) -> Response
-    speech_text = "Settings lights to Rainbow Chase"
+    speech_text = "Setting lights to Rainbow Chase"
     light_loop.set_looping_pattern(xmasTree.rainbowCycle)
+    return handler_input.response_builder.speak(speech_text).set_should_end_session(
+        True).response
+
+
+@sb.request_handler(can_handle_func=is_intent_name("slowRainbowTheaterChaseIntent"))
+def slow_rainbow_chase_handler(handler_input):
+    """Handler for setRainbowChaseIntent Intent."""
+    # type: (HandlerInput) -> Response
+    speech_text = "Setting lights to slow Rainbow Theater Chase"
+    light_loop.set_looping_pattern(xmasTree.theater_chase_rainbow, {"wait_ms": 100})
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -78,7 +83,29 @@ def turn_off_lights_intent(handler_input):
     """Handler to turn off the lights."""
     # type: (HandlerInput) -> Response
     speech_text = "Turning off the lights."
-    light_loop.set_static_lights(xmasTree.setSolid, {LedColor.black})
+    light_loop.set_static_lights(xmasTree.set_solid, {"color": LedColor.black})
+    return handler_input.response_builder.speak(speech_text).set_should_end_session(
+        True).response
+
+
+@sb.request_handler(can_handle_func=is_intent_name("solidRandomIntent"))
+def random_solid_intent(handler_input):
+    """Handler to turn the string random colors."""
+    # type: (HandlerInput) -> Response
+    speech_text = "Setting to random solid colors."
+    light_loop.set_static_lights(xmasTree.random_colors)
+    return handler_input.response_builder.speak(speech_text).set_should_end_session(
+        True).response
+
+
+@sb.request_handler(can_handle_func=is_intent_name("slowRandomTransitionIntent"))
+def randomly_transition_between_colors_intent(handler_input):
+    """Handler to turn the string random colors."""
+    # type: (HandlerInput) -> Response
+    speech_text = "Starting random color mood."
+    light_loop.set_looping_pattern(
+        xmasTree.transition_to_random_color, {"wait_after_transition_ms": 1}
+    )
     return handler_input.response_builder.speak(speech_text).set_should_end_session(
         True).response
 
@@ -155,11 +182,16 @@ def invoke_skill():
 @app.route("/test/", methods=['GET', 'POST'])
 def test_turn_yellow():
     light_loop.process.terminate()
-    light_loop.process = Process(target=xmasTree.setSolid, args=[LedColor.yellow])
+    light_loop.process = Process(target=xmasTree.set_solid, args=[LedColor.yellow])
     light_loop.process.start()
     return FlaskResponse("Test Received!!", status=202)
 
 
-
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0", ssl_context=(config.https_cert, config.https_key))
+    app.run(
+        # Port in use by tunnel
+        port=5000,
+        # Run on all IPs
+        host="0.0.0.0",
+        ssl_context=(config.https_cert, config.https_key)
+    )
