@@ -99,7 +99,7 @@ def random_solid_intent(handler_input):
 
 
 @sb.request_handler(can_handle_func=is_intent_name("slowRandomTransitionIntent"))
-def random_transition_slow(handler_input):
+def randomly_transition_between_colors_intent(handler_input):
     """Handler to turn the string random colors."""
     # type: (HandlerInput) -> Response
     speech_text = "Starting random color mood."

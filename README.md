@@ -15,7 +15,9 @@
 <tr>
 <td>start slow color changing</td>
 <td>slowRandomTransitionIntent</td>    
-<td>light_loop.set_static_lights(xmasTree.loop_random_color_transition)</td>
+<td>light_loop.set_looping_pattern(
+        xmasTree.transition_to_random_color, {"wait_after_transition_ms": 1}
+    )</td>
 </tr>
 <tr>
 <td>solid random colors</td>

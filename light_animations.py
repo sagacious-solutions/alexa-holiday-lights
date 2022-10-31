@@ -62,7 +62,7 @@ class XmasString:
             wait_ms (int, optional): how many milliseconds between changing each pixel.
                 Defaults to 50.
         """
-        print("color_wipe_inside_out_reversed")
+        logger.info("color_wipe_inside_out_reversed")
         half = int(self.strip.numPixels() / 2)
         for i in range(half):
             self.strip.setPixelColor(0 + i, color)
@@ -96,7 +96,7 @@ class XmasString:
             color (Color): _description_
             wait_ms (int, optional): _description_. Defaults to 50.
         """
-        print("color_wipe_inside_out")
+        logger.info("color_wipe_inside_out")
         half = int(self.strip.numPixels() / 2)
         for i in range(half):
             self.strip.setPixelColor(half - i, color)
