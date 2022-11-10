@@ -2,6 +2,8 @@
 
 This is a repository for my holiday light string. Utilizing a Raspberry Pi and a ws281x RGB Light string, we are able to create a voice controlled set of lights.
 
+<img src="./docs/rainbow_lights.gif" width="50%" />
+
 ### To Get Running
 
 1) Create an Alexa Skill in the Alexa Dashboard. 
@@ -59,7 +61,7 @@ This is a repository for my holiday light string. Utilizing a Raspberry Pi and a
 </table>
 
 ## Hardware
-<p>Current hardware is a Raspberry Pi 4 running off an NVMe SSD on USB3.0 for rapid prototyping. However once development is complete it will likely be moved to Raspberry Pi Zero W or other inexpensive SBC.</p>
+<p>Current hardware is a Raspberry Pi 4 running off an NVMe SSD on USB3.0 for rapid prototyping. However once development is complete it will be moved onto a Raspberry Pi Zero 2.</p>
 <img src="./docs/pi4_hardware.jpg" width="50%" />
 
 ### RGB Lights
